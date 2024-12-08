@@ -5,8 +5,6 @@ import altair as alt # チャート可視化機能をインポート
 
 #取得する銘柄の名前とキーを変換する一覧を設定
 #東証などのシンボルはhttps://support.yahoo-net.jp/PccFinance/s/article/H000006603で検索できる
-
-# 取得したデータから抽出するための配列で絞ってdataに代入
 tickers = {
     'apple': 'AAPL',
     'facebook': 'META',
@@ -18,7 +16,7 @@ tickers = {
     'TOYOTA': '7203.T',
 }
 
-st.title('株価可視化アプリ') # サイドバーに表示
+st.title('株価可視化アプリ') # タイトル
 
 st.sidebar.write("こちらは株価可視化ツールです。以下のオプションから表示日数を指定できます。") # サイドバーに表示
 
@@ -36,9 +34,8 @@ def get_data(days, tickers):
     # 選択した株価の数だけ yf.Tickerでリクエストしてデータを取得する
     for company in tickers.keys():
         tkr = yf.Ticker(tickers[company]) # 設定した銘柄一覧でリクエストの為の7203.Tなどに変換をして、それをyf.Tickerで株価リクエスト
-        
-        
-         #日数をyfinanceが対応する期間に変換
+
+        #日数をyfinanceが対応する期間に変換
         if days <= 5:
             period = '1d'  # 5日以内は1日ごとのデータ
         elif days <= 30:
@@ -51,7 +48,7 @@ def get_data(days, tickers):
             period = '1y'  # 1年以内
         else:
             period = '2y'  # 2年以内
-            
+
         hist = tkr.history(period=period) # スライドバーで指定した日数で取得した情報を絞る
         hist.index = pd.to_datetime(hist.index) # DatetimeIndexに変換
         hist.index = hist.index.strftime('%d %B %Y') # indexを日付のフォーマットに変更
@@ -63,25 +60,25 @@ def get_data(days, tickers):
     return df # 返り値としてdfを返す
 
 # チャートに表示する範囲をスライドで表示し、それぞれをymin, ymaxに代入
-st.write("株価の範囲指定") # サイドバーに表示
-ymin, ymax = st.slider(
+st.sidebar.write("株価の範囲指定") # サイドバーに表示
+ymin, ymax = st.sidebar.slider(
     '範囲を指定してください。',
     0.0, 5000.0, (0.0, 5000.0)
 ) # サイドバーに表示
 
-df = get_data(days,tickers) # リクエストする企業一覧すべてと変換するtickersを引数に株価取得
+df = get_data(days, tickers) # リクエストする企業一覧すべてと変換するtickersを引数に株価取得
 
 
 # 取得したデータから抽出するための配列を生成し、companiesに代入
 companies = st.multiselect(
     '会社名を選択してください。',
     list(df.index),
-    ['google', 'apple', 'TOYOTA'],
-) # 最初に表示する企業名を設定
+    ['google', 'apple','TOYOTA'], # 最初に表示する企業名を設定
+)
 
 
 data = df.loc[companies] # 取得したデータから抽出するための配列で絞ってdataに代入
-st.write("株価", data.sort_index())   # dataにあるindexを表示
+st.write("株価 ", data.sort_index()) # dataにあるindexを表示
 data = data.T.reset_index() # dataを抽出して転置
 
 # 企業ごとの別々のカラムにデータを表示する必要ないので企業を１つのカラムに統一
