@@ -1,3 +1,5 @@
+pip install -r requirements.txt
+
 import streamlit as st # フロントエンドを扱うstreamlitの機能をインポート
 import pandas as pd # データフレームを扱う機能をインポート
 import yfinance as yf # yahoo financeから株価情報を取得するための機能をインポート
